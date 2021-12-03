@@ -10,6 +10,8 @@ import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
 
+const { privateKey } = require('./secrets.json');
+
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
 const chainIds = {
@@ -57,10 +59,11 @@ const config: HardhatUserConfig = {
       },
       chainId: chainIds.hardhat,
     },
-    goerli: getChainConfig("goerli"),
-    kovan: getChainConfig("kovan"),
-    rinkeby: getChainConfig("rinkeby"),
-    ropsten: getChainConfig("ropsten"),
+    fantomtestnet: {
+      	url: "https://rpc.testnet.fantom.network/",
+      	chainID : 4002,
+      	accounts: [privateKey]
+    }
   },
   paths: {
     artifacts: "./artifacts",
