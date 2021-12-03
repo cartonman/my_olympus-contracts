@@ -12,37 +12,8 @@ import { NetworkUserConfig } from "hardhat/types";
 
 const { privateKey } = require('./secrets.json');
 
-dotenvConfig({ path: resolve(__dirname, "./.env") });
-
-const chainIds = {
-  goerli: 5,
-  hardhat: 31337,
-  kovan: 42,
-  mainnet: 1,
-  rinkeby: 4,
-  ropsten: 3,
-};
-
-// Ensure that we have all the environment variables we need.
-const mnemonic: string | undefined = process.env.MNEMONIC ?? "NO_MNEMONIC";
-// Make sure node is setup on Alchemy website
-const alchemyApiKey: string | undefined = process.env.ALCHEMY_API_KEY ?? "NO_ALCHEMY_API_KEY";
-
-function getChainConfig(network: keyof typeof chainIds): NetworkUserConfig {
-  const url: string = `https://eth-${network}.alchemyapi.io/v2/${alchemyApiKey}`;
-  return {
-    accounts: {
-      count: 10,
-      mnemonic,
-      path: "m/44'/60'/0'/0",
-    },
-    chainId: chainIds[network],
-    url,
-  };
-}
-
 const config: HardhatUserConfig = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "localhost",
   gasReporter: {
     currency: "USD",
     enabled: process.env.REPORT_GAS ? true : false,
@@ -50,19 +21,18 @@ const config: HardhatUserConfig = {
     src: "./contracts",
   },
   networks: {
+    localhost: {
+      url: "http://127.0.0.1:8545"
+    },
     hardhat: {
-      forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`
-      },
-      accounts: {
-        mnemonic,
-      },
-      chainId: chainIds.hardhat,
+    },
+    rinkeby: {
+      url: "http://127.0.0.1:8545"
     },
     fantomtestnet: {
-      	url: "https://rpc.testnet.fantom.network/",
-      	chainID : 4002,
-      	accounts: [privateKey]
+      url: "https://rpc.testnet.fantom.network/",
+      chainID : 4002,
+      accounts: [privateKey]
     }
   },
   paths: {
@@ -100,9 +70,6 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: "types",
     target: "ethers-v5",
-  },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
   }
 };
 
