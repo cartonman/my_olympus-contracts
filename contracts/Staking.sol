@@ -29,7 +29,7 @@ contract OlympusStaking is OlympusAccessControlled {
     struct Epoch {
         uint256 length;
         uint256 number;
-        uint256 endBlock;
+        uint256 end;
         uint256 distribute;
     }
 
@@ -62,7 +62,7 @@ contract OlympusStaking is OlympusAccessControlled {
         address _gOHM,
         uint256 _epochLength,
         uint256 _firstEpochNumber,
-        uint256 _firstEpochBlock,
+        uint256 _firstEpochTime,
         address _authority
     ) OlympusAccessControlled(IOlympusAuthority(_authority)) {
         require(_ohm != address(0), "Zero address: OHM");
@@ -72,7 +72,7 @@ contract OlympusStaking is OlympusAccessControlled {
         require(_gOHM != address(0), "Zero address: gOHM");
         gOHM = IgOHM(_gOHM);
 
-        epoch = Epoch({length: _epochLength, number: _firstEpochNumber, endBlock: _firstEpochBlock, distribute: 0});
+        epoch = Epoch({length: _epochLength, number: _firstEpochNumber, end: _firstEpochTime, distribute: 0});
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -220,10 +220,10 @@ contract OlympusStaking is OlympusAccessControlled {
      * @notice trigger rebase if epoch over
      */
     function rebase() public {
-        if (epoch.endBlock <= block.number) {
+        if (epoch.end <= block.timestamp) {
             sOHM.rebase(epoch.distribute, epoch.number);
 
-            epoch.endBlock = epoch.endBlock.add(epoch.length);
+            epoch.end = epoch.end.add(epoch.length);
             epoch.number++;
 
             if (distributor != address(0)) {
